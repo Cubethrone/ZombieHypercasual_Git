@@ -1,0 +1,33 @@
+{
+    "name": "UI_Input",
+    "maps": [
+        {
+            "name": "Joystick",
+            "id": "3d892f1c-ed88-41a6-be5b-0c2ab0a8f81b",
+            "actions": [
+                {
+                    "name": "Aim",
+                    "type": "Value",
+                    "id": "f23fb031-d6e2-429c-a643-8037b049e083",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a7ee810c-830d-41c7-9720-73e3782a4ed3",
+                    "path": "<AndroidJoystick>/stick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
