@@ -14,7 +14,7 @@ public class Aim : MonoBehaviour
     public UI_Input input;
     public Vector3 shootPosition;
     public GameObject BulletPrefab, bulletPosition;
-    public LayerMask zombie;
+    public LayerMask zombie,survivor;
 
     //to include the delay while shooting 
     public float defaultTime = 0;
@@ -50,7 +50,6 @@ public class Aim : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 1000f, zombie))
             {
-
                 defaultTime = defaultTime + Time.deltaTime;
 
                 if (defaultTime >= delayTimeShoot)
@@ -59,6 +58,10 @@ public class Aim : MonoBehaviour
                     shootBullet();
                     defaultTime = 0;
                 }
+            }
+            if (Physics.Raycast(ray, out hit, 1000f, survivor))
+            {
+                Debug.Log("You Killed A survivor");
             }
             Vector3 GunpointPosFar = new Vector3(LaserTarget.position.x, LaserTarget.position.y, Camera.main.farClipPlane);
             Vector3 GunpointPosNear = new Vector3(LaserTarget.position.x, LaserTarget.position.y, Camera.main.nearClipPlane);

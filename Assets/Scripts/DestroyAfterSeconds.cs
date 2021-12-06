@@ -13,15 +13,15 @@ public class DestroyAfterSeconds : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
+
     void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.tag == "Enemy")
         {
-
             Destroy(collision.collider.gameObject);
-            Destroy(gameObject);
+            Destroy (gameObject);
         }
     }
 }
