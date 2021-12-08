@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DestroyAfterSeconds : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
     {
         Destroy(this.gameObject, 0.8f);
@@ -13,7 +12,7 @@ public class DestroyAfterSeconds : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void OnCollisionEnter(Collision collision)
@@ -21,7 +20,7 @@ public class DestroyAfterSeconds : MonoBehaviour
         if (collision.collider.tag == "Enemy")
         {
             Destroy(collision.collider.gameObject);
-            Destroy (gameObject);
+            Destroy(gameObject);
         }
     }
 }

@@ -20,6 +20,8 @@ public class Aim : MonoBehaviour
     public float defaultTime = 0;
     public float delayTimeShoot = 0.25f;
     public Animator Pistol;
+    public ParticleSystem blood;
+
 
     // Start is called before the first frame update
     void Start()
@@ -48,13 +50,16 @@ public class Aim : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 1000f, zombie))
             {
-                defaultTime = defaultTime + Time.deltaTime;
+                shootBullet();
+                var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                Destroy(ParticleSystem.gameObject);
+                // defaultTime = defaultTime + Time.deltaTime;
 
-                if (defaultTime >= delayTimeShoot)
-                {
-                    shootBullet();
-                    defaultTime = 0;
-                }
+                // if (defaultTime >= delayTimeShoot)
+                // {
+                //     shootBullet();
+                //     defaultTime = 0;
+                // }
             }
             if (Physics.Raycast(ray, out hit, 1000f, survivor))
             {
@@ -83,17 +88,17 @@ public class Aim : MonoBehaviour
     {
         {
             Pistol.SetTrigger("Fire");
-            Invoke("InstanciateBullet", 0.15f);
+
         }
     }
-    public void InstanciateBullet()
-    {
-        GameObject projectile = Instantiate(BulletPrefab, bulletPosition.transform.position, Quaternion.identity);
-        projectile.transform.position = bulletPosition.transform.position;
-        Vector3 rotation = projectile.transform.rotation.eulerAngles;
-        projectile.transform.rotation = Quaternion.Euler(rotation.x, transform.eulerAngles.y, rotation.z);
-        projectile.GetComponent<Rigidbody>().AddForce(shootPosition * 50 * Time.deltaTime, ForceMode.Impulse);
-    }
+    // public void InstanciateBullet()
+    // {
+    //     GameObject projectile = Instantiate(BulletPrefab, shootPosition, Quaternion.identity);
+    //     projectile.transform.position = bulletPosition.transform.position;
+    //     Vector3 rotation = projectile.transform.rotation.eulerAngles;
+    //     projectile.transform.rotation = Quaternion.Euler(rotation.x, transform.eulerAngles.y, rotation.z);
+    //     projectile.GetComponent<Rigidbody>().AddForce(shootPosition * 50 * Time.deltaTime, ForceMode.Impulse);
+    // }
     private void OnEnable()
     {
         input.Enable();
