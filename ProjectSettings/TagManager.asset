@@ -17,10 +17,10 @@ TagManager:
   - zombie
   - Survivor
   - DeadZombie
-  - 
-  - 
-  - 
-  - 
+  - BodyPart
+  - LowerLeg_Hand
+  - UpperLeg_Hand
+  - Head
   - 
   - 
   - 

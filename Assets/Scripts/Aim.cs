@@ -1,41 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class Aim : MonoBehaviour
 {
+    public int maxAmmo = 12, currentAmmo = -1;
+    public TextMeshProUGUI Ammo_text;
     //touch ke liye 
     private Touch touch;
     public float moveSpeed = 0.25f;
-
     //gun object and to roatate it with the aim point    
     public Transform LaserTarget;
     public GameObject Gun;
-    public UI_Input input;
+
     public Vector3 shootPosition;
-    public GameObject BulletPrefab, bulletPosition;
     public LayerMask zombie, survivor;
 
     //to include the delay while shooting 
-    public float defaultTime = 0;
-    public float delayTimeShoot = 0.25f;
+    public float FireRate = 15f;
+    public float NextTimeToFire = 0f;
     public Animator Pistol;
     public ParticleSystem blood;
-
-
-    // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Screen Width : " + Screen.width);
-        Debug.Log("Screen Width : " + Screen.height);
+        currentAmmo = maxAmmo;
     }
     void Awake()
     {
-        input = new UI_Input();
+
     }
-    // Update is called once per frame
     void Update()
     {
+        UpdateUI();
+
         if (Input.touchCount > 0)
         {
             touch = Input.GetTouch(0);
@@ -46,26 +43,6 @@ public class Aim : MonoBehaviour
                 LaserTarget.transform.position.y + touch.deltaPosition.y * moveSpeed,
                 LaserTarget.transform.position.z + touch.deltaPosition.y * moveSpeed);
             }
-            var ray = Camera.main.ScreenPointToRay(LaserTarget.position);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 1000f, zombie))
-            {
-                shootBullet();
-                var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
-                Destroy(ParticleSystem.gameObject);
-                // defaultTime = defaultTime + Time.deltaTime;
-
-                // if (defaultTime >= delayTimeShoot)
-                // {
-                //     shootBullet();
-                //     defaultTime = 0;
-                // }
-            }
-            if (Physics.Raycast(ray, out hit, 1000f, survivor))
-            {
-                shootBullet();
-                Debug.Log("You Killed A survivor");
-            }
             Vector3 GunpointPosFar = new Vector3(LaserTarget.position.x, LaserTarget.position.y, Camera.main.farClipPlane);
             Vector3 GunpointPosNear = new Vector3(LaserTarget.position.x, LaserTarget.position.y, Camera.main.nearClipPlane);
             Vector3 gunPointF = Camera.main.ScreenToWorldPoint(GunpointPosFar);
@@ -73,6 +50,50 @@ public class Aim : MonoBehaviour
             Debug.DrawRay(gunPointN, gunPointF - gunPointN, Color.black);
             shootPosition = gunPointF - gunPointN;
             Gun.transform.LookAt(shootPosition);
+            if (Time.time >= NextTimeToFire && currentAmmo != 0)
+            {
+                var ray = Camera.main.ScreenPointToRay(LaserTarget.position);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+                {
+                    if (hit.transform.GetComponent<Limb>())
+                    {
+                        Limb limb = hit.transform.GetComponent<Limb>();
+                        var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                        Destroy(ParticleSystem.gameObject, 4);
+                        currentAmmo--;
+                        limb.getHit();
+                        
+                        hit.collider.gameObject.transform.root.GetComponent<CapsuleCollider>().enabled = false;
+                        if(hit.rigidbody!=null)
+                        {
+                            hit.rigidbody.AddForce(-hit.normal*6000);
+                        }
+                        
+                    }
+                }
+                if (Physics.Raycast(ray, out hit, 1000f, zombie))
+                {
+                    currentAmmo--;
+                    
+                    NextTimeToFire = Time.time + 1f / FireRate;
+                    var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                    Destroy(ParticleSystem.gameObject, 5);
+
+                }
+                if (Physics.Raycast(ray, out hit, 1000f, survivor))
+                {
+                    currentAmmo--;
+                    NextTimeToFire = Time.time + 1f / FireRate;
+                    Debug.Log("You Killed A survivor");
+                }
+            }
+
+        }
+        if (currentAmmo <= 0)
+        {
+            Reload();
+            return;
         }
         //clamping system
         Vector3 clampedPosition = LaserTarget.transform.localPosition;
@@ -81,31 +102,19 @@ public class Aim : MonoBehaviour
         clampedPosition.x = Mathf.Clamp(clampedPosition.x, -Screen.width / 2, Screen.width / 2);
         // re-assigning the transform's position will clamp it
         LaserTarget.transform.localPosition = clampedPosition;
-
-
     }
-    public void shootBullet()
+    void Reload()
     {
-        {
-            Pistol.SetTrigger("Fire");
-
-        }
+        Pistol.SetTrigger("Reload");
+        Invoke("bulletSetup", 1f);
     }
-    // public void InstanciateBullet()
-    // {
-    //     GameObject projectile = Instantiate(BulletPrefab, shootPosition, Quaternion.identity);
-    //     projectile.transform.position = bulletPosition.transform.position;
-    //     Vector3 rotation = projectile.transform.rotation.eulerAngles;
-    //     projectile.transform.rotation = Quaternion.Euler(rotation.x, transform.eulerAngles.y, rotation.z);
-    //     projectile.GetComponent<Rigidbody>().AddForce(shootPosition * 50 * Time.deltaTime, ForceMode.Impulse);
-    // }
-    private void OnEnable()
+    void bulletSetup()
     {
-        input.Enable();
-
+        currentAmmo = maxAmmo;
     }
-    private void OnDisable()
+
+    void UpdateUI()
     {
-        input.Disable();
+        Ammo_text.text = currentAmmo.ToString();
     }
 }

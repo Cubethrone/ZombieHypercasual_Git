@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class DestroyAfterSeconds : MonoBehaviour
 {
+    public float destroyTime;
     void Start()
     {
-        Destroy(this.gameObject, 0.8f);
+        Destroy(this.gameObject, destroyTime);
     }
 
     // Update is called once per frame

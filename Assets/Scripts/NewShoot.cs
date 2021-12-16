@@ -13,22 +13,22 @@ public class NewShoot : MonoBehaviour
     //gun object and to roatate it with the aim point    
     public Transform LaserTarget;
     public ParticleSystem blood, hitmisk;
-    public LayerMask zombie, Deadzombie, survivor, anything;
+    public GameObject head, lower, upper;
+    public LayerMask zombie, Deadzombie, survivor, anything, Head, LowerLeg_Hand, UpperLeg_Hand;
     public Animator gun;
-    public TextMeshProUGUI  Ammo_text;
+    public TextMeshProUGUI Ammo_text;
     void Start()
     {
-        
         currentAmmo = maxAmmo;
     }
     void Update()
     {
         UpdateUI();
-        if (currentAmmo <= 0)
-        {
-            StartCoroutine(Reload());
-            return;
-        }
+        // if (currentAmmo <= 0)
+        // {
+        //     StartCoroutine(Reload());
+        //     return;
+        // }
         if (Input.touchCount > 0)
         {
             touch = Input.GetTouch(0);
@@ -59,6 +59,7 @@ public class NewShoot : MonoBehaviour
             }
             if (Physics.Raycast(ray, out hit, 1000f, Deadzombie))
             {
+                hit.collider.gameObject.transform.localScale = new Vector3(0, 0, 0);
                 currentAmmo--;
                 var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
                 Destroy(ParticleSystem.gameObject, 3);
@@ -68,6 +69,30 @@ public class NewShoot : MonoBehaviour
                 currentAmmo--;
                 var ParticleSystem = Instantiate(hitmisk, hit.point, Quaternion.identity);
                 Destroy(ParticleSystem.gameObject, 3);
+            }
+            if (Physics.Raycast(ray, out hit, 1000f, Head))
+            {
+                currentAmmo--;
+                var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                Instantiate(head, hit.point, Quaternion.identity);
+                Destroy(ParticleSystem.gameObject, 3);
+                return;
+            }
+            if (Physics.Raycast(ray, out hit, 1000f, LowerLeg_Hand))
+            {
+                currentAmmo--;
+                var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                Instantiate(lower, hit.point, Quaternion.identity);
+                Destroy(ParticleSystem.gameObject, 3);
+                return;
+            }
+            if (Physics.Raycast(ray, out hit, 1000f, UpperLeg_Hand))
+            {
+                currentAmmo--;
+                var ParticleSystem = Instantiate(blood, hit.point, Quaternion.identity);
+                Instantiate(upper, hit.point, Quaternion.identity);
+                Destroy(ParticleSystem.gameObject, 3);
+                return;
             }
             clampAim();
         }
@@ -99,15 +124,6 @@ public class NewShoot : MonoBehaviour
     void UpdateUI()
     {
         Ammo_text.text = currentAmmo.ToString();
-    }
-    IEnumerator Reload()
-    {
-        isReloading = true;
-        gun.SetTrigger("Reload");
-        Debug.Log("reloading");
-        yield return new WaitForSeconds(reloadTime);
-        currentAmmo = maxAmmo;
-        isReloading = false;
     }
 
 
